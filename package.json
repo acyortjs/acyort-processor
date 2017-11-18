@@ -1,0 +1,25 @@
+{
+  "name": "acyort-processor",
+  "version": "0.0.0",
+  "description": "Processor for AcyOrt",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/acyortjs/acyort-processor.git"
+  },
+  "keywords": [
+    "acyort",
+    "processor",
+    "issues",
+    "json"
+  ],
+  "author": "LoeiFy@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/acyortjs/acyort-processor/issues"
+  },
+  "homepage": "https://github.com/acyortjs/acyort-processor#readme"
+}
