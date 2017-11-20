@@ -21,7 +21,7 @@ class Processor extends Pagination {
     this.paginations = { categories: {}, tags: {} }
   }
 
-  _setCategories(post) {
+  setCategories(post) {
     const {
       id,
       name,
@@ -41,7 +41,7 @@ class Processor extends Pagination {
     }
   }
 
-  _setPaginations() {
+  setPaginations() {
     const { config: { title }, posts } = this
     const page = { name: title, posts }
     const archives = {
@@ -70,7 +70,7 @@ class Processor extends Pagination {
     })
   }
 
-  _setTags(post) {
+  setTags(post) {
     post.tags.forEach((tag) => {
       const {
         id,
@@ -92,18 +92,17 @@ class Processor extends Pagination {
     })
   }
 
-  _setPosts(posts) {
+  setPosts(posts) {
     this.posts = posts.map((post, i) => {
-      const data = this._getPost(post)
+      const data = this.getPost(post)
       data.prev = i > 0 ? posts[i - 1].id : ''
       data.next = i < posts.length - 1 ? posts[i + 1].id : ''
       return data
     })
   }
 
-  _getPost(post) {
-    const { config } = this
-    const { markeder, config: { post_dir } } = this
+  getPost(post) {
+    const { config, markeder } = this
     const {
       id,
       created_at,
@@ -122,8 +121,8 @@ class Processor extends Pagination {
       created: created_at,
       updated: updated_at,
       title,
-      path: `/${post_dir}/${id}.html`,
-      url: `/${post_dir}/${id}.html`,
+      path: `/${config.post_dir}/${id}.html`,
+      url: `/${config.post_dir}/${id}.html`,
       author: {
         name: login,
         avatar: avatar_url,
@@ -145,7 +144,7 @@ class Processor extends Pagination {
     return data
   }
 
-  _setPages(pages) {
+  setPages(pages) {
     this.pages = pages.map(page => postPage(page, this.markeder))
   }
 
@@ -153,16 +152,16 @@ class Processor extends Pagination {
     const { pages, posts } = postFilter(issues, this.config)
 
     if (!pages.length && !posts.length) {
-      return Promise.reject('No content. Please check user, repository or authors fields')
+      return Promise.reject(new Error('No content. Check user, repository or authors fields'))
     }
 
-    this._setPages(pages)
-    this._setPosts(posts)
+    this.setPages(pages)
+    this.setPosts(posts)
     this.posts.forEach((post) => {
-      this._setCategories(post)
-      this._setTags(post)
+      this.setCategories(post)
+      this.setTags(post)
     })
-    this._setPaginations()
+    this.setPaginations()
 
     return Promise.resolve({
       posts: this.posts,
@@ -173,3 +172,5 @@ class Processor extends Pagination {
     })
   }
 }
+
+module.exports = Processor
