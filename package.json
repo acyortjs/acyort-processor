@@ -4,7 +4,9 @@
   "description": "Processor for AcyOrt",
   "main": "index.js",
   "scripts": {
-    "test:lint": "eslint ."
+    "test": "npm run test:lint && npm run test:cover",
+    "test:lint": "eslint .",
+    "test:cover": "istanbul cover --print both _mocha -r test"
   },
   "repository": {
     "type": "git",
@@ -25,9 +27,13 @@
   "devDependencies": {
     "eslint": "^4.11.0",
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.8.0"
+    "eslint-plugin-import": "^2.8.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^4.0.1",
+    "power-assert": "^1.4.4"
   },
   "dependencies": {
+    "acyort-marked": "^0.1.2",
     "markdown-toc": "^1.2.0"
   }
 }
