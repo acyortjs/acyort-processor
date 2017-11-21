@@ -35,6 +35,95 @@ describe('processor', () => {
     assert((await rejects(processor.process([]))).message === msg)
   })
 
+  it('paginations', async () => {
+    const processor = new Processor(config)
+    const {
+      categories,
+      tags,
+      posts,
+      paginations,
+    } = await processor.process(issues)
+    const { page, archives } = paginations
+
+    assert(archives.length === 1)
+    assert(archives[0].id === 0)
+    assert(archives[0].name === config.title)
+    assert(archives[0].posts.length === posts.length)
+    assert(archives[0].path === `/${config.archives_dir}/index.html`)
+    assert(archives[0].current === 1)
+    assert(archives[0].total === 1)
+
+    assert(page.length === Math.ceil(posts.length / config.per_page))
+    assert(page[0].id === 0)
+    assert(page[0].name === config.title)
+    page.forEach((p, i) => {
+      assert(p.posts.length <= config.per_page)
+      assert(p.total === page.length)
+      assert(p.current === i + 1)
+      if (i === 0) {
+        assert(p.path === '/index.html')
+        assert(p.prev === '')
+        assert(p.next === '/page/2/')
+      } else {
+        assert(p.path === `/page/${i + 1}/index.html`)
+        if (i === 1) {
+          assert(p.prev === '/')
+        } else {
+          assert(p.prev === `/page/${i}/`)
+        }
+        if (i === page.length - 1) {
+          assert(p.next === '')
+        } else {
+          assert(p.next === `/page/${i + 2}/`)
+        }
+      }
+    })
+
+    categories.forEach((c) => {
+      assert(paginations.categories[c.id].length === Math.ceil(c.posts.length / config.per_page))
+      assert(paginations.categories[c.id][0].id === c.id)
+      assert(paginations.categories[c.id][0].name === c.name)
+      assert(paginations.categories[c.id][0].path === `/${config.category_dir}/${c.id}/index.html`)
+
+      paginations.categories[c.id].forEach(p => assert(p.posts.length <= config.per_page))
+      assert(paginations.categories[c.id][0].total === paginations.categories[c.id].length)
+
+      if (paginations.categories[c.id].length === 1) {
+        assert(paginations.categories[c.id][0].prev === '')
+        assert(paginations.categories[c.id][0].next === '')
+        assert(paginations.categories[c.id][0].current === 1)
+      } else {
+        assert(paginations.categories[c.id][1].current === 2)
+        assert(paginations.categories[c.id][0].prev === '')
+        assert(paginations.categories[c.id][1].prev === `/${config.category_dir}/${c.id}/`)
+        assert(paginations.categories[c.id][0].next === `/${config.category_dir}/${c.id}/2/`)
+        assert(paginations.categories[c.id][1].next === '')
+      }
+    })
+
+    tags.forEach((t) => {
+      assert(paginations.tags[t.id].length === Math.ceil(t.posts.length / config.per_page))
+      assert(paginations.tags[t.id][0].id === t.id)
+      assert(paginations.tags[t.id][0].name === t.name)
+      assert(paginations.tags[t.id][0].path === `/${config.tag_dir}/${t.id}/index.html`)
+
+      paginations.tags[t.id].forEach(p => assert(p.posts.length <= config.per_page))
+      assert(paginations.tags[t.id][0].total === paginations.tags[t.id].length)
+
+      if (paginations.tags[t.id].length === 1) {
+        assert(paginations.tags[t.id][0].prev === '')
+        assert(paginations.tags[t.id][0].next === '')
+        assert(paginations.tags[t.id][0].current === 1)
+      } else {
+        assert(paginations.tags[t.id][1].current === 2)
+        assert(paginations.tags[t.id][0].prev === '')
+        assert(paginations.tags[t.id][1].prev === `/${config.tag_dir}/${t.id}/`)
+        assert(paginations.tags[t.id][0].next === `/${config.tag_dir}/${t.id}/2/`)
+        assert(paginations.tags[t.id][1].next === '')
+      }
+    })
+  })
+
   it('tags', async () => {
     const processor = new Processor(config)
     const { tags, posts, pages } = await processor.process(issues)
