@@ -29,27 +29,6 @@
       "site_admin": false
     },
     "labels": [
-      {
-        "id": 335624169,
-        "url": "https://api.github.com/repos/acyortjs/acyortjs.github.io/labels/enhancement",
-        "name": "enhancement",
-        "color": "84b6eb",
-        "default": true
-      },
-      {
-        "id": 335624170,
-        "url": "https://api.github.com/repos/acyortjs/acyortjs.github.io/labels/help%20wanted",
-        "name": "help wanted",
-        "color": "159818",
-        "default": true
-      },
-      {
-        "id": 335624171,
-        "url": "https://api.github.com/repos/acyortjs/acyortjs.github.io/labels/invalid",
-        "name": "invalid",
-        "color": "e6e6e6",
-        "default": true
-      }
     ],
     "state": "closed",
     "locked": false,
