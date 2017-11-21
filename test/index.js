@@ -29,9 +29,7 @@ describe('processor', () => {
     let processor = new Processor(_config)
 
     assert((await rejects(processor.process(issues))).message === msg)
-
     processor = new Processor(config)
-
     assert((await rejects(processor.process([]))).message === msg)
   })
 
