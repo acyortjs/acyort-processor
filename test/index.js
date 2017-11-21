@@ -35,6 +35,66 @@ describe('processor', () => {
     assert((await rejects(processor.process([]))).message === msg)
   })
 
+  it('tags', async () => {
+    const processor = new Processor(config)
+    const { tags, posts, pages } = await processor.process(issues)
+    const _labels = []
+    const noLabels = []
+    let _posts = []
+    const pageids = pages.map(p => p.id)
+
+    issues.forEach(({ labels }, i) => {
+      if (!labels.length && pageids.indexOf(issues[i].id) === -1) {
+        noLabels.push(issues[i].id)
+      }
+      labels.forEach((label) => {
+        const exits = _labels.find(l => l.id === label.id)
+        if (!exits) {
+          _labels.push(label)
+        }
+      })
+    })
+
+    tags.forEach((t) => {
+      assert(_labels.find(l => l.id === t.id) !== undefined)
+      assert(_labels.find(l => l.name === t.name) !== undefined)
+      assert(t.url === `/${config.tag_dir}/${t.id}/`)
+      _posts = _posts.concat(t.posts)
+    })
+
+    _posts = [...new Set(_posts)]
+    assert(_posts.length + noLabels.length === posts.length)
+  })
+
+  it('categories', async () => {
+    const processor = new Processor(config)
+    const { categories, posts } = await processor.process(issues)
+    const milestones = []
+    let _posts = []
+
+    issues.forEach(({ milestone }) => {
+      if (milestone) {
+        const exits = milestones.find(m => m.id === milestone.id)
+        if (!exits) {
+          milestones.push(milestone)
+        }
+      }
+    })
+
+    categories.forEach((c) => {
+      if (c.id !== 0) {
+        assert(milestones.find(m => m.id === c.id) !== undefined)
+        assert(milestones.find(m => m.title === c.name) !== undefined)
+      } else {
+        assert(c.name === config.default_category)
+      }
+      assert(c.url === `/${config.category_dir}/${c.id}/`)
+      _posts = _posts.concat(c.posts)
+    })
+
+    assert(posts.length === _posts.length)
+  })
+
   it('pages', async () => {
     const processor = new Processor(config)
     const { pages } = await processor.process(issues)
