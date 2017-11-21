@@ -1,5 +1,8 @@
 # acyort-processor
 
+[![Build Status](https://travis-ci.org/acyortjs/acyort-processor.svg?branch=master)](https://travis-ci.org/acyortjs/acyort-processor)
+[![codecov](https://codecov.io/gh/acyortjs/acyort-processor/branch/master/graph/badge.svg)](https://codecov.io/gh/acyortjs/acyort-processor)
+
 Processor for [AcyOrt](https://github.com/acyortjs/acyort)
 
 ## Install
