@@ -1,6 +1,6 @@
 {
   "name": "acyort-processor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Processor for AcyOrt",
   "main": "index.js",
   "scripts": {
@@ -31,11 +31,11 @@
     "eslint-plugin-import": "^2.8.0",
     "intelli-espower-loader": "^1.0.1",
     "istanbul": "^0.4.5",
+    "acyort-marked": "^0.1.2",
     "mocha": "^4.0.1",
     "power-assert": "^1.4.4"
   },
   "dependencies": {
-    "acyort-marked": "^0.1.2",
     "markdown-toc": "^1.2.0"
   }
 }
