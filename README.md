@@ -14,6 +14,8 @@ $ npm i acyort-processor -S
 ## Usage
 
 ```js
+// npm i acyort-marked -S
+const Marked = require('acyort-marked')
 const Processor = require('acyort-processor')
 
 const config = {
@@ -28,7 +30,10 @@ const config = {
   "thumbnail_mode": 1
 }
 const issues = [...issues] // data from github api
-const processor = new Processor(config)
+const processor = new Processor({
+  config,
+  markeder: new Marked(config)
+})
 
 processor.process(issue)
   .then(res => console.log(res))
