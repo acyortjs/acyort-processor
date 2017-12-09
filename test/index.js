@@ -26,30 +26,22 @@ describe('processor', () => {
     const msg = 'No content. Check user, repository or authors fields'
     const _config = JSON.parse(JSON.stringify(config))
     _config.authors = ['author']
-    let processor = new Processor(_config)
+    let processor = new Processor({ config: _config, markeder })
 
     assert((await rejects(processor.process(issues))).message === msg)
-    processor = new Processor(config)
+    processor = new Processor({ config, markeder })
     assert((await rejects(processor.process([]))).message === msg)
   })
 
   it('paginations', async () => {
-    const processor = new Processor(config)
+    const processor = new Processor({ config, markeder })
     const {
       categories,
       tags,
       posts,
       paginations,
     } = await processor.process(issues)
-    const { page, archives } = paginations
-
-    assert(archives.length === 1)
-    assert(archives[0].id === 0)
-    assert(archives[0].name === config.title)
-    assert(archives[0].posts.length === posts.length)
-    assert(archives[0].path === `/${config.archives_dir}/index.html`)
-    assert(archives[0].current === 1)
-    assert(archives[0].total === 1)
+    const { page } = paginations
 
     assert(page.length === Math.ceil(posts.length / config.per_page))
     assert(page[0].id === 0)
@@ -123,7 +115,7 @@ describe('processor', () => {
   })
 
   it('tags', async () => {
-    const processor = new Processor(config)
+    const processor = new Processor({ config, markeder })
     const { tags, posts, pages } = await processor.process(issues)
     const _labels = []
     const noLabels = []
@@ -154,7 +146,7 @@ describe('processor', () => {
   })
 
   it('categories', async () => {
-    const processor = new Processor(config)
+    const processor = new Processor({ config, markeder })
     const { categories, posts } = await processor.process(issues)
     const milestones = []
     let _posts = []
@@ -183,7 +175,7 @@ describe('processor', () => {
   })
 
   it('pages', async () => {
-    const processor = new Processor(config)
+    const processor = new Processor({ config, markeder })
     const { pages } = await processor.process(issues)
     const issue = issues[3]
     const page = pages[0]
@@ -201,7 +193,7 @@ describe('processor', () => {
 
   it('posts', async () => {
     const _config = JSON.parse(JSON.stringify(config))
-    let processor = new Processor(_config)
+    let processor = new Processor({ config: _config, markeder })
     let { posts } = await processor.process(issues)
     const post = posts[0]
     const issue = issues[0]
@@ -242,9 +234,17 @@ describe('processor', () => {
     assert(posts[posts.length - 1].next === '')
 
     _config.thumbnail_mode = 2
-    processor = new Processor(_config)
+    processor = new Processor({ config: _config, markeder })
     posts = (await processor.process(issues)).posts
 
     assert(posts[0].content.indexOf(posts[0].thumb) > -1)
   })
 })
+
+    // assert(archives.length === 1)
+    // assert(archives[0].id === 0)
+    // assert(archives[0].name === config.title)
+    // assert(archives[0].posts.length === posts.length)
+    // assert(archives[0].path === `/${config.archives_dir}/index.html`)
+    // assert(archives[0].current === 1)
+    // assert(archives[0].total === 1)

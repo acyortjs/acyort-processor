@@ -22,10 +22,8 @@ const config = {
   "category_dir": "category",
   "default_category": "uncategorized",
   "authors": ["LoeiFy"],
-  "archives_per_page": 0,
   "per_page": 2,
   "root": "/",
-  "archives_dir": "archives",
   "tag_dir": "tag",
   "thumbnail_mode": 1
 }
@@ -44,7 +42,6 @@ processor.process(issue)
   tags: [...],
   paginations: {
     page: [...],
-    archives: [...],
     categories: {
       ...: [...]
     },

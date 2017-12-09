@@ -38,14 +38,8 @@ class Processor extends Pagination {
   setPaginations() {
     const { config: { title }, posts } = this
     const page = { name: title, posts }
-    const archives = {
-      name: title,
-      type: 'archives',
-      posts,
-    }
 
     this.paginations.page = this.paging(page)
-    this.paginations.archives = this.paging(archives)
     this.categories.forEach((c) => {
       const category = Object.assign({ type: 'category' }, {
         name: c.name,
