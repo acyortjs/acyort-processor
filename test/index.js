@@ -38,6 +38,29 @@ describe('processor', () => {
     assert((await rejects(processor.process([]))).message === msg)
   })
 
+  it('pagination', async () => {
+    const config = getConfig()
+    const processor = new Processor(config)
+    const {
+      posts,
+      index,
+      categories,
+      tags,
+      category,
+      tag,
+    } = await processor.process(issues)
+
+    assert(index.length === Math.ceil(posts.length / config.per_page))
+
+    categories.forEach((c) => {
+      assert(category[c.id].length === Math.ceil(c.posts.length / config.per_page))
+    })
+
+    tags.forEach((t) => {
+      assert(tag[t.id].length === Math.ceil(t.posts.length / config.per_page))
+    })
+  })
+
   it('tags', async () => {
     const processor = new Processor(originConfig)
     const { tags, posts, pages } = await processor.process(issues)
