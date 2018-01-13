@@ -13,7 +13,7 @@ class Processor extends Pagination {
     this.pages = []
     this.category = {}
     this.tag = {}
-    this.index = []
+    this.home = []
   }
 
   setCategories(post) {
@@ -39,7 +39,7 @@ class Processor extends Pagination {
   setPaginations() {
     const { config: { title }, posts } = this
 
-    this.index = this.paging({ name: title, posts })
+    this.home = this.paging({ name: title, posts })
     this.categories.forEach((category) => {
       const data = Object.assign(category, { type: 'category' })
       this.category[category.id] = this.paging(data)
@@ -100,7 +100,7 @@ class Processor extends Pagination {
       pages: this.pages,
       categories: this.categories,
       tags: this.tags,
-      index: this.index,
+      home: this.home,
       category: this.category,
       tag: this.tag,
     })

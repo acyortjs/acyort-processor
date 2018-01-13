@@ -2,15 +2,19 @@ const assert = require('power-assert')
 const Marked = require('acyort-marked')
 const Processor = require('../')
 const issues = require('./fixtures/issues.json')
-const config = require('./fixtures/config.json')
+const originConfig = require('./fixtures/config.json')
 
-const marked = new Marked(config)
+const marked = new Marked(originConfig)
 const markeder = (...args) => marked.mark(...args)
 
 function rejects(promise) {
   return promise
     .then(() => Promise.reject(new Error('Missing expected rejection')))
     .catch(reason => Promise.resolve(reason))
+}
+
+function getConfig() {
+  return JSON.parse(JSON.stringify(originConfig))
 }
 
 String.prototype.trim = function() {
@@ -24,18 +28,17 @@ String.prototype.trim = function() {
 describe('processor', () => {
   it('no content', async () => {
     const msg = 'No content. Check user, repository or authors fields'
-    const _config = JSON.parse(JSON.stringify(config))
-    _config.authors = ['author']
-    let processor = new Processor({
-      config: _config,
-      markeder: new Marked(config)
-    })
 
+    const config = getConfig()
+    config.authors = ['author']
+    let processor = new Processor(config)
     assert((await rejects(processor.process(issues))).message === msg)
-    processor = new Processor({ config, markeder: new Marked(config) })
+
+    processor = new Processor(originConfig)
     assert((await rejects(processor.process([]))).message === msg)
   })
 
+/*
   it('paginations', async () => {
     const processor = new Processor({ config, markeder: new Marked(config) })
     const {
@@ -118,12 +121,9 @@ describe('processor', () => {
   })
 
   it('no paginations', async () => {
-    const _config = JSON.parse(JSON.stringify(config))
+    const _config = getConfig()
     _config.per_page = 0
-    const processor = new Processor({
-      config: _config,
-      markeder: new Marked(config)
-    })
+    const processor = new Processor(_config)
     const {
       posts,
       paginations: { page }
@@ -137,9 +137,10 @@ describe('processor', () => {
     assert(page[0].current === 1)
     assert(page[0].total === 1)
   })
+*/
 
   it('tags', async () => {
-    const processor = new Processor({ config, markeder: new Marked(config) })
+    const processor = new Processor(originConfig)
     const { tags, posts, pages } = await processor.process(issues)
     const _labels = []
     const noLabels = []
@@ -161,7 +162,7 @@ describe('processor', () => {
     tags.forEach((t) => {
       assert(_labels.find(l => l.id === t.id) !== undefined)
       assert(_labels.find(l => l.name === t.name) !== undefined)
-      assert(t.url === `/${config.tag_dir}/${t.id}/`)
+      assert(t.url === `/${originConfig.tag_dir}/${t.id}/`)
       _posts = _posts.concat(t.posts)
     })
 
@@ -170,7 +171,7 @@ describe('processor', () => {
   })
 
   it('categories', async () => {
-    const processor = new Processor({ config, markeder: new Marked(config) })
+    const processor = new Processor(originConfig)
     const { categories, posts } = await processor.process(issues)
     const milestones = []
     let _posts = []
@@ -189,9 +190,9 @@ describe('processor', () => {
         assert(milestones.find(m => m.id === c.id) !== undefined)
         assert(milestones.find(m => m.title === c.name) !== undefined)
       } else {
-        assert(c.name === config.default_category)
+        assert(c.name === originConfig.default_category)
       }
-      assert(c.url === `/${config.category_dir}/${c.id}/`)
+      assert(c.url === `/${originConfig.category_dir}/${c.id}/`)
       _posts = _posts.concat(c.posts)
     })
 
@@ -199,7 +200,7 @@ describe('processor', () => {
   })
 
   it('pages', async () => {
-    const processor = new Processor({ config, markeder: new Marked(config) })
+    const processor = new Processor(originConfig)
     const { pages } = await processor.process(issues)
     const issue = issues[3]
     const page = pages[0]
@@ -216,11 +217,8 @@ describe('processor', () => {
   })
 
   it('posts', async () => {
-    const _config = JSON.parse(JSON.stringify(config))
-    let processor = new Processor({
-      config: _config,
-      markeder: new Marked(config)
-    })
+    const _config = getConfig()
+    let processor = new Processor(_config)
     let { posts } = await processor.process(issues)
     const post = posts[0]
     const issue = issues[0]
@@ -235,19 +233,16 @@ describe('processor', () => {
     assert(post.author.name === issue.user.login)
     assert(post.author.avatar === issue.user.avatar_url)
     assert(post.author.url === issue.user.html_url)
-    assert(post.toc.trim() === '<ul><li><a href=\"#anh1header\"> An h1 header</a><ul><li><a href=\"#anh2header\"> An h2 header</a><ul><li><a href=\"#anh3header\"> An h3 header</a></li></ul></li></ul></li></ul>')
     assert(post.category.id === issue.milestone.id)
     assert(post.category.name === issue.milestone.title)
     assert(posts[1].tags.length === issues[1].labels.length)
     assert(posts[1].tags[0].id === issues[1].labels[0].id)
     assert(posts[1].tags[0].name === issues[1].labels[0].name)
-    assert((/\.(gif|jpg|jpeg|png)$/i).test(post.thumb) === true)
-    assert(issue.body.indexOf(post.thumb) > -1)
-    assert(post.content.indexOf(post.thumb) === -1)
     assert(post.summary === '')
     assert(post.html === markeder(issue.body, true))
     assert(posts[2].content === markeder(issues[2].body.replace(/<!--\s*more\s*-->/, '')))
     assert(posts[2].summary === markeder(issues[2].body.split(/<!--\s*more\s*-->/)[0]))
+    assert(post.raw === issue.body)
 
     assert(`/${_config.category_dir}/${posts[0].category.id}/` === posts[0].category.url)
     assert(`/${_config.category_dir}/0/` === posts[3].category.url)
@@ -259,14 +254,5 @@ describe('processor', () => {
     assert(posts[0].prev === '')
     assert(posts[1].prev === posts[0].id)
     assert(posts[posts.length - 1].next === '')
-
-    _config.thumbnail_mode = 2
-    processor = new Processor({
-      config: _config,
-      markeder: new Marked(config)
-    })
-    posts = (await processor.process(issues)).posts
-
-    assert(posts[0].content.indexOf(posts[0].thumb) > -1)
   })
 })
