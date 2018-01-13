@@ -14,8 +14,6 @@ $ npm i acyort-processor -S
 ## Usage
 
 ```js
-// npm i acyort-marked -S
-const Marked = require('acyort-marked')
 const Processor = require('acyort-processor')
 
 const config = {
@@ -26,14 +24,10 @@ const config = {
   "authors": ["LoeiFy"],
   "per_page": 2,
   "root": "/",
-  "tag_dir": "tag",
-  "thumbnail_mode": 1
+  "tag_dir": "tag"
 }
 const issues = [...issues] // data from github api
-const processor = new Processor({
-  config,
-  markeder: new Marked(config)
-})
+const processor = new Processor(config)
 
 processor.process(issue)
   .then(res => console.log(res))
@@ -45,14 +39,12 @@ processor.process(issue)
   pages: [...],
   categories: [...],
   tags: [...],
-  paginations: {
-    page: [...],
-    categories: {
-      ...: [...]
-    },
-    tags: {
-      ...: [...]
-    }
+  index: [...],
+  category: {
+    ...: [...]
+  },
+  tag: {
+    ...: [...]
   }
 }
 more: check the issue https://github.com/acyortjs/acyortjs.github.io/issues/11
