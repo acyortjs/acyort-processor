@@ -1,11 +1,10 @@
-const Pagination = require('./lib/pagination')
+const pagination = require('acyort-pagination')
 const filterFn = require('./lib/filter')
 const pageFn = require('./lib/page')
 const postFn = require('./lib/post')
 
-class Processor extends Pagination {
+class Processor {
   constructor(config) {
-    super(config)
     this.config = config
     this.categories = []
     this.tags = []
@@ -13,7 +12,7 @@ class Processor extends Pagination {
     this.pages = []
     this.category = {}
     this.tag = {}
-    this.home = []
+    this.index = []
   }
 
   setCategories(post) {
@@ -37,16 +36,35 @@ class Processor extends Pagination {
   }
 
   setPaginations() {
-    const { config: { title }, posts } = this
+    const {
+      per_page: perpage,
+      category_dir: categoryDir,
+      tag_dir: tagDir,
+    } = this.config
 
-    this.home = this.paging({ name: title, posts })
-    this.categories.forEach((category) => {
-      const data = Object.assign(category, { type: 'category' })
-      this.category[category.id] = this.paging(data)
+    this.index = pagination({
+      title: this.config.title,
+      posts: this.posts.map(post => post.id),
+      base: '/',
+      perpage,
     })
-    this.tags.forEach((tag) => {
-      const data = Object.assign(tag, { type: 'tag' })
-      this.tag[tag.id] = this.paging(data)
+    this.categories.forEach(({ id, posts, name: title }) => {
+      const data = {
+        base: `/${categoryDir}/${id}`,
+        posts,
+        title,
+        perpage,
+      }
+      this.category[id] = pagination(data)
+    })
+    this.tags.forEach(({ id, posts, name: title }) => {
+      const data = {
+        base: `/${tagDir}/${id}`,
+        posts,
+        title,
+        perpage,
+      }
+      this.tag[id] = pagination(data)
     })
   }
 
@@ -100,7 +118,7 @@ class Processor extends Pagination {
       pages: this.pages,
       categories: this.categories,
       tags: this.tags,
-      home: this.home,
+      index: this.index,
       category: this.category,
       tag: this.tag,
     })

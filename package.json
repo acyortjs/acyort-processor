@@ -35,6 +35,7 @@
     "power-assert": "^1.4.4"
   },
   "dependencies": {
-    "acyort-marked": "^0.1.3"
+    "acyort-marked": "^0.1.3",
+    "acyort-pagination": "^0.1.0"
   }
 }
