@@ -11,7 +11,9 @@ class Processor extends Pagination {
     this.tags = []
     this.posts = []
     this.pages = []
-    this.paginations = { categories: {}, tags: {} }
+    this.category = {}
+    this.tag = {}
+    this.index = []
   }
 
   setCategories(post) {
@@ -36,34 +38,20 @@ class Processor extends Pagination {
 
   setPaginations() {
     const { config: { title }, posts } = this
-    const page = { name: title, posts }
 
-    this.paginations.page = this.paging(page)
-    this.categories.forEach((c) => {
-      const category = Object.assign({ type: 'category' }, {
-        name: c.name,
-        id: c.id,
-        posts: c.posts,
-      })
-      this.paginations.categories[c.id] = this.paging(category)
+    this.index = this.paging({ name: title, posts })
+    this.categories.forEach((category) => {
+      const data = Object.assign(category, { type: 'category' })
+      this.category[category.id] = this.paging(data)
     })
-    this.tags.forEach((t) => {
-      const tag = Object.assign({ type: 'tag' }, {
-        name: t.name,
-        id: t.id,
-        posts: t.posts,
-      })
-      this.paginations.tags[t.id] = this.paging(tag)
+    this.tags.forEach((tag) => {
+      const data = Object.assign(tag, { type: 'tag' })
+      this.tag[tag.id] = this.paging(data)
     })
   }
 
   setTags(post) {
-    post.tags.forEach((tag) => {
-      const {
-        id,
-        name,
-        url,
-      } = tag
+    post.tags.forEach(({ id, name, url }) => {
       const index = this.tags.map(t => t.name).indexOf(name)
 
       if (index === -1) {
@@ -81,20 +69,15 @@ class Processor extends Pagination {
 
   setPosts(posts) {
     this.posts = posts.map((post, i) => {
-      const data = postFn(post, {
-        config: this.config,
-        markeder: this.markeder,
-      })
-
+      const data = postFn(post, this.config)
       data.prev = i > 0 ? posts[i - 1].id : ''
       data.next = i < posts.length - 1 ? posts[i + 1].id : ''
-
       return data
     })
   }
 
   setPages(pages) {
-    this.pages = pages.map(page => pageFn(page, this.markeder))
+    this.pages = pages.map(page => pageFn(page, this.config))
   }
 
   process(issues) {
@@ -117,7 +100,9 @@ class Processor extends Pagination {
       pages: this.pages,
       categories: this.categories,
       tags: this.tags,
-      paginations: this.paginations,
+      index: this.index,
+      category: this.category,
+      tag: this.tag,
     })
   }
 }
