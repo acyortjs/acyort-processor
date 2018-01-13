@@ -4,10 +4,9 @@ const pageFn = require('./lib/page')
 const postFn = require('./lib/post')
 
 class Processor extends Pagination {
-  constructor({ config, markeder }) {
+  constructor(config) {
     super(config)
     this.config = config
-    this.markeder = (...args) => markeder.mark(...args)
     this.categories = []
     this.tags = []
     this.posts = []
