@@ -8,7 +8,7 @@
     "html_url": "https://github.com/acyortjs/acyortjs.github.io/issues/7",
     "id": 138196161,
     "number": 7,
-    "title": "Markdown Test ",
+    "title": "[/a/b/c]Markdown Test ",
     "user": {
       "login": "LoeiFy",
       "id": 2193211,
@@ -108,20 +108,6 @@
       "site_admin": false
     },
     "labels": [
-      {
-        "id": 335624168,
-        "url": "https://api.github.com/repos/acyortjs/acyortjs.github.io/labels/duplicate",
-        "name": "duplicate",
-        "color": "cccccc",
-        "default": true
-      },
-      {
-        "id": 335624169,
-        "url": "https://api.github.com/repos/acyortjs/acyortjs.github.io/labels/enhancement",
-        "name": "enhancement",
-        "color": "84b6eb",
-        "default": true
-      }
     ],
     "state": "closed",
     "locked": false,

@@ -1,6 +1,6 @@
 {
   "name": "acyort-processor",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Data Processor for AcyOrt",
   "main": "index.js",
   "scripts": {

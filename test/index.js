@@ -1,4 +1,5 @@
 const assert = require('power-assert')
+const path = require('path')
 const Marked = require('acyort-marked')
 const Processor = require('../')
 const issues = require('./fixtures/issues.json')
@@ -124,14 +125,14 @@ describe('processor', () => {
   it('pages', async () => {
     const processor = new Processor(originConfig)
     const { pages } = await processor.process(issues)
-    const issue = issues[3]
+    const issue = issues[0]
     const page = pages[0]
 
-    assert(pages.length === 1)
+    assert(pages.length === 2)
     assert(page.id === issue.id)
-    assert(page.url === `/${issue.title.split(']')[0].split('[')[1]}/`)
-    assert(page.path === `/${issue.title.split(']')[0].split('[')[1]}/index.html`)
-    assert(page.name === issue.title.split(']')[0].split('[')[1])
+    assert(page.url === path.join('/', `/${issue.title.split(']')[0].split('[')[1]}/`))
+    assert(page.path === path.join('/', `/${issue.title.split(']')[0].split('[')[1]}/index.html`))
+    assert(page.name === issue.title.split(']')[0].split('[')[1].split('/').filter(i => i).slice(-1)[0])
     assert(page.title === issue.title.split(']')[1])
     assert(page.created === issue.created_at)
     assert(page.updated === issue.updated_at)
@@ -143,9 +144,9 @@ describe('processor', () => {
     let processor = new Processor(_config)
     let { posts } = await processor.process(issues)
     const post = posts[0]
-    const issue = issues[0]
+    const issue = issues[1]
 
-    assert(posts.length === 5)
+    assert(posts.length === 4)
     assert(post.id === issue.id)
     assert(post.created === issue.created_at)
     assert(post.updated === issue.updated_at)
@@ -157,17 +158,17 @@ describe('processor', () => {
     assert(post.author.url === issue.user.html_url)
     assert(post.category.id === issue.milestone.id)
     assert(post.category.name === issue.milestone.title)
-    assert(posts[1].tags.length === issues[1].labels.length)
-    assert(posts[1].tags[0].id === issues[1].labels[0].id)
-    assert(posts[1].tags[0].name === issues[1].labels[0].name)
+    assert(posts[1].tags.length === issues[2].labels.length)
+    assert(posts[1].tags[0].id === issues[2].labels[0].id)
+    assert(posts[1].tags[0].name === issues[2].labels[0].name)
     assert(post.excerpt === '')
-    assert(posts[2].content === markeder(issues[2].body.replace(/<!--\s*more\s*-->/, '')))
-    assert(posts[2].excerpt === markeder(issues[2].body.split(/<!--\s*more\s*-->/)[0]))
+    assert(posts[1].content === markeder(issues[2].body.replace(/<!--\s*more\s*-->/, '')))
+    assert(posts[1].excerpt === markeder(issues[2].body.split(/<!--\s*more\s*-->/)[0]))
     assert(post.raw === issue.body)
 
     assert(`/${_config.category_dir}/${posts[0].category.id}/` === posts[0].category.url)
-    assert(`/${_config.category_dir}/0/` === posts[3].category.url)
-    assert(_config.default_category === posts[3].category.name)
+    assert(`/${_config.category_dir}/0/` === posts[2].category.url)
+    assert(_config.default_category === posts[2].category.name)
     assert(posts[0].tags.length === 0)
     assert(`/${_config.tag_dir}/${posts[1].tags[0].id}/` === posts[1].tags[0].url)
 
