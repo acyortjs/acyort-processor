@@ -160,9 +160,9 @@ describe('processor', () => {
     assert(posts[1].tags.length === issues[1].labels.length)
     assert(posts[1].tags[0].id === issues[1].labels[0].id)
     assert(posts[1].tags[0].name === issues[1].labels[0].name)
-    assert(post.summary === '')
+    assert(post.excerpt === '')
     assert(posts[2].content === markeder(issues[2].body.replace(/<!--\s*more\s*-->/, '')))
-    assert(posts[2].summary === markeder(issues[2].body.split(/<!--\s*more\s*-->/)[0]))
+    assert(posts[2].excerpt === markeder(issues[2].body.split(/<!--\s*more\s*-->/)[0]))
     assert(post.raw === issue.body)
 
     assert(`/${_config.category_dir}/${posts[0].category.id}/` === posts[0].category.url)
