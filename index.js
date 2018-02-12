@@ -3,126 +3,121 @@ const filterFn = require('./lib/filter')
 const pageFn = require('./lib/page')
 const postFn = require('./lib/post')
 
-class Processor {
-  constructor(config) {
-    this.config = config
-    this.categories = []
-    this.tags = []
-    this.posts = []
-    this.pages = []
-    this.category = {}
-    this.tag = {}
-    this.index = []
+const ERROR = 'No content. Check user, repository or authors fields'
+
+function processor(issues) {
+  const {
+    per_page: perpage,
+    category_dir: categoryDir,
+    tag_dir: tagDir,
+  } = this
+  const category = {}
+  const tag = {}
+
+  let { pages, posts } = filterFn.call(this, issues)
+  let categories = []
+  let tags = []
+  let index = []
+
+  if (!pages.length && !posts.length) {
+    return Promise.reject(new Error(ERROR))
   }
 
-  setCategories(post) {
+
+  function getCategories(post) {
+    const back = []
     const {
       id,
       name,
       url,
     } = post.category
-    const index = this.categories.map(c => c.name).indexOf(name)
+    const pos = back.map(c => c.name).indexOf(name)
 
-    if (index === -1) {
-      this.categories.push({
+    if (pos === -1) {
+      back.push({
         id,
         name,
         url,
         posts: [post.id],
       })
     } else {
-      this.categories[index].posts.push(post.id)
+      back[pos].posts.push(post.id)
     }
+
+    return back
   }
 
-  setPaginations() {
-    const {
-      per_page: perpage,
-      category_dir: categoryDir,
-      tag_dir: tagDir,
-    } = this.config
+  function getTags(post) {
+    const back = []
 
-    this.index = pagination({
-      title: this.config.title,
-      posts: this.posts.map(post => post.id),
-      base: '/',
-      perpage,
-    })
-    this.categories.forEach(({ id, posts, name: title }) => {
-      const data = {
-        base: `/${categoryDir}/${id}`,
-        posts,
-        title,
-        perpage,
-      }
-      this.category[id] = pagination(data)
-    })
-    this.tags.forEach(({ id, posts, name: title }) => {
-      const data = {
-        base: `/${tagDir}/${id}`,
-        posts,
-        title,
-        perpage,
-      }
-      this.tag[id] = pagination(data)
-    })
-  }
-
-  setTags(post) {
     post.tags.forEach(({ id, name, url }) => {
-      const index = this.tags.map(t => t.name).indexOf(name)
+      const pos = back.map(t => t.name).indexOf(name)
 
-      if (index === -1) {
-        this.tags.push({
+      if (pos === -1) {
+        back.push({
           id,
           name,
           url,
           posts: [post.id],
         })
       } else {
-        this.tags[index].posts.push(post.id)
+        back[pos].posts.push(post.id)
       }
     })
+
+    return back
   }
 
-  setPosts(posts) {
-    this.posts = posts.map((post, i) => {
-      const data = postFn(post, this.config)
-      data.prev = i > 0 ? posts[i - 1].id : ''
-      data.next = i < posts.length - 1 ? posts[i + 1].id : ''
-      return data
-    })
-  }
+  pages = pages.map(page => pageFn.call(this, page))
 
-  setPages(pages) {
-    this.pages = pages.map(page => pageFn(page, this.config))
-  }
+  posts = posts.map((post, i) => {
+    const data = postFn.call(this, post)
+    data.prev = i > 0 ? posts[i - 1].id : ''
+    data.next = i < posts.length - 1 ? posts[i + 1].id : ''
+    return data
+  })
 
-  process(issues) {
-    const { pages, posts } = filterFn(issues, this.config)
+  posts.forEach((post) => {
+    categories = getCategories(post)
+    tags = getTags(post)
+  })
 
-    if (!pages.length && !posts.length) {
-      return Promise.reject(new Error('No content. Check user, repository or authors fields'))
+  index = pagination({
+    title: this.title,
+    posts: posts.map(post => post.id),
+    base: '/',
+    perpage,
+  })
+
+  categories.forEach((c) => {
+    const data = {
+      base: `/${categoryDir}/${c.id}`,
+      posts: c.posts,
+      title: c.title,
+      perpage,
     }
+    category[c.id] = pagination(data)
+  })
 
-    this.setPages(pages)
-    this.setPosts(posts)
-    this.posts.forEach((post) => {
-      this.setCategories(post)
-      this.setTags(post)
-    })
-    this.setPaginations()
+  tags.forEach((t) => {
+    const data = {
+      base: `/${tagDir}/${t.id}`,
+      posts: t.posts,
+      title: t.title,
+      perpage,
+    }
+    tag[t.id] = pagination(data)
+  })
 
-    return Promise.resolve({
-      posts: this.posts,
-      pages: this.pages,
-      categories: this.categories,
-      tags: this.tags,
-      index: this.index,
-      category: this.category,
-      tag: this.tag,
-    })
-  }
+  return Promise.resolve({
+    posts,
+    pages,
+    categories,
+    tags,
+    index,
+    category,
+    tag,
+  })
 }
 
-module.exports = Processor
+module.exports = processor
