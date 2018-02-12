@@ -1,7 +1,7 @@
 const assert = require('power-assert')
 const path = require('path')
 const Marked = require('acyort-marked')
-const Processor = require('../')
+const processor = require('../')
 const issues = require('./fixtures/issues.json')
 const originConfig = require('./fixtures/config.json')
 
@@ -32,16 +32,13 @@ describe('processor', () => {
 
     const config = getConfig()
     config.authors = ['author']
-    let processor = new Processor(config)
-    assert((await rejects(processor.process(issues))).message === msg)
 
-    processor = new Processor(originConfig)
-    assert((await rejects(processor.process([]))).message === msg)
+    assert((await rejects(processor.call(config, issues))).message === msg)
+    assert((await rejects(processor.call(config, []))).message === msg)
   })
 
   it('pagination', async () => {
     const config = getConfig()
-    const processor = new Processor(config)
     const {
       posts,
       index,
@@ -49,7 +46,7 @@ describe('processor', () => {
       tags,
       category,
       tag,
-    } = await processor.process(issues)
+    } = await processor.call(config, issues)
 
     assert(index.length === Math.ceil(posts.length / config.per_page))
 
@@ -63,8 +60,7 @@ describe('processor', () => {
   })
 
   it('tags', async () => {
-    const processor = new Processor(originConfig)
-    const { tags, posts, pages } = await processor.process(issues)
+    const { tags, posts, pages } = await processor.call(originConfig, issues)
     const _labels = []
     const noLabels = []
     let _posts = []
@@ -90,12 +86,12 @@ describe('processor', () => {
     })
 
     _posts = [...new Set(_posts)]
+
     assert(_posts.length + noLabels.length === posts.length)
   })
 
   it('categories', async () => {
-    const processor = new Processor(originConfig)
-    const { categories, posts } = await processor.process(issues)
+    const { categories, posts } = await processor.call(originConfig, issues)
     const milestones = []
     let _posts = []
 
@@ -123,8 +119,7 @@ describe('processor', () => {
   })
 
   it('pages', async () => {
-    const processor = new Processor(originConfig)
-    const { pages } = await processor.process(issues)
+    const { pages } = await processor.call(originConfig, issues)
     const issue = issues[0]
     const page = pages[0]
 
@@ -141,8 +136,7 @@ describe('processor', () => {
 
   it('posts', async () => {
     const _config = getConfig()
-    let processor = new Processor(_config)
-    let { posts } = await processor.process(issues)
+    let { posts } = await processor.call(_config, issues)
     const post = posts[0]
     const issue = issues[1]
 

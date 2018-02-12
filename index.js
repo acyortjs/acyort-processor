@@ -13,59 +13,51 @@ function processor(issues) {
   } = this
   const category = {}
   const tag = {}
+  const categories = []
+  const tags = []
 
   let { pages, posts } = filterFn.call(this, issues)
-  let categories = []
-  let tags = []
   let index = []
 
   if (!pages.length && !posts.length) {
     return Promise.reject(new Error(ERROR))
   }
 
-
-  function getCategories(post) {
-    const back = []
+  function setCategories(post) {
     const {
       id,
       name,
       url,
     } = post.category
-    const pos = back.map(c => c.name).indexOf(name)
+    const pos = categories.map(c => c.name).indexOf(name)
 
     if (pos === -1) {
-      back.push({
+      categories.push({
         id,
         name,
         url,
         posts: [post.id],
       })
     } else {
-      back[pos].posts.push(post.id)
+      categories[pos].posts.push(post.id)
     }
-
-    return back
   }
 
-  function getTags(post) {
-    const back = []
-
+  function setTags(post) {
     post.tags.forEach(({ id, name, url }) => {
-      const pos = back.map(t => t.name).indexOf(name)
+      const pos = tags.map(t => t.name).indexOf(name)
 
       if (pos === -1) {
-        back.push({
+        tags.push({
           id,
           name,
           url,
           posts: [post.id],
         })
       } else {
-        back[pos].posts.push(post.id)
+        tags[pos].posts.push(post.id)
       }
     })
-
-    return back
   }
 
   pages = pages.map(page => pageFn.call(this, page))
@@ -78,8 +70,8 @@ function processor(issues) {
   })
 
   posts.forEach((post) => {
-    categories = getCategories(post)
-    tags = getTags(post)
+    setCategories(post)
+    setTags(post)
   })
 
   index = pagination({
