@@ -14,7 +14,7 @@ $ npm i acyort-processor -S
 ## Usage
 
 ```js
-const Processor = require('acyort-processor')
+const processor = require('acyort-processor')
 
 const config = {
   "title": "acyort",
@@ -27,9 +27,8 @@ const config = {
   "tag_dir": "tag"
 }
 const issues = [...issues] // data from github api
-const processor = new Processor(config)
 
-processor.process(issue)
+processor.call(config, issue)
   .then(res => console.log(res))
   .catch(err => console.error(err))
 
@@ -47,6 +46,6 @@ processor.process(issue)
     ...: [...]
   }
 }
-more: check the issue https://github.com/acyortjs/acyortjs.github.io/issues/11
+more: https://acyort.com/docs/variables/
 */
 ```
