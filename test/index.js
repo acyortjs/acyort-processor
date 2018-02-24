@@ -6,7 +6,7 @@ const issues = require('./fixtures/issues.json')
 const originConfig = require('./fixtures/config.json')
 
 const marked = new Marked(originConfig)
-const markeder = (...args) => marked.mark(...args)
+const markeder = (...args) => marked.parse(...args)
 
 function rejects(promise) {
   return promise

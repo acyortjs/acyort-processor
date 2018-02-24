@@ -1,6 +1,6 @@
 {
   "name": "acyort-processor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Data Processor for AcyOrt",
   "main": "index.js",
   "scripts": {
@@ -35,7 +35,7 @@
     "power-assert": "^1.4.4"
   },
   "dependencies": {
-    "acyort-marked": "^1.0.0",
+    "acyort-marked": "^1.1.0",
     "acyort-pagination": "^0.1.1"
   }
 }
