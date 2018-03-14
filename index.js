@@ -85,7 +85,7 @@ function processor(issues) {
     const data = {
       base: `/${categoryDir}/${c.id}`,
       posts: c.posts,
-      title: c.title,
+      title: c.name,
       perpage,
     }
     category[c.id] = pagination(data)
@@ -95,7 +95,7 @@ function processor(issues) {
     const data = {
       base: `/${tagDir}/${t.id}`,
       posts: t.posts,
-      title: t.title,
+      title: t.name,
       perpage,
     }
     tag[t.id] = pagination(data)
