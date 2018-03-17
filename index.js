@@ -36,6 +36,7 @@ function processor(issues) {
         id,
         name,
         url,
+        type: 'categories',
         posts: [post.id],
       })
     } else {
@@ -52,6 +53,7 @@ function processor(issues) {
           id,
           name,
           url,
+          type: 'tags',
           posts: [post.id],
         })
       } else {
@@ -79,7 +81,7 @@ function processor(issues) {
     posts: posts.map(post => post.id),
     base: '/',
     perpage,
-  })
+  }, { type: 'index' })
 
   categories.forEach((c) => {
     const data = {
@@ -88,7 +90,7 @@ function processor(issues) {
       title: c.name,
       perpage,
     }
-    category[c.id] = pagination(data)
+    category[c.id] = pagination(data, { type: 'category' })
   })
 
   tags.forEach((t) => {
@@ -98,7 +100,7 @@ function processor(issues) {
       title: t.name,
       perpage,
     }
-    tag[t.id] = pagination(data)
+    tag[t.id] = pagination(data, { type: 'tag' })
   })
 
   return Promise.resolve({

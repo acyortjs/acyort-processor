@@ -49,13 +49,16 @@ describe('processor', () => {
     } = await processor.call(config, issues)
 
     assert(index.length === Math.ceil(posts.length / config.per_page))
+    assert(index[0].type === 'index')
 
     categories.forEach((c) => {
       assert(category[c.id].length === Math.ceil(c.posts.length / config.per_page))
+      assert(category[c.id][0].type === 'category')
     })
 
     tags.forEach((t) => {
       assert(tag[t.id].length === Math.ceil(t.posts.length / config.per_page))
+      assert(tag[t.id][0].type === 'tag')
     })
   })
 
@@ -82,6 +85,7 @@ describe('processor', () => {
       assert(_labels.find(l => l.id === t.id) !== undefined)
       assert(_labels.find(l => l.name === t.name) !== undefined)
       assert(t.url === `/${originConfig.tag_dir}/${t.id}/`)
+      assert(t.type === 'tags')
       _posts = _posts.concat(t.posts)
     })
 
@@ -112,6 +116,7 @@ describe('processor', () => {
         assert(c.name === originConfig.default_category)
       }
       assert(c.url === `/${originConfig.category_dir}/${c.id}/`)
+      assert(c.type === 'categories')
       _posts = _posts.concat(c.posts)
     })
 
@@ -132,6 +137,7 @@ describe('processor', () => {
     assert(page.created === issue.created_at)
     assert(page.updated === issue.updated_at)
     assert(markeder(issue.body) === page.content)
+    assert(page.type === 'page')
   })
 
   it('posts', async () => {
@@ -170,5 +176,6 @@ describe('processor', () => {
     assert(posts[0].prev === '')
     assert(posts[1].prev === posts[0].id)
     assert(posts[posts.length - 1].next === '')
+    assert(posts[0].type === 'post')
   })
 })
