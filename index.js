@@ -3,8 +3,6 @@ const filterFn = require('./lib/filter')
 const pageFn = require('./lib/page')
 const postFn = require('./lib/post')
 
-const ERROR = 'No content. Check user, repository or authors fields'
-
 function processor(issues) {
   const {
     per_page: perpage,
@@ -18,10 +16,6 @@ function processor(issues) {
 
   let { pages, posts } = filterFn.call(this, issues)
   let index = []
-
-  if (!pages.length && !posts.length) {
-    return Promise.reject(new Error(ERROR))
-  }
 
   function setCategories(post) {
     const {

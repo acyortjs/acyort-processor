@@ -8,12 +8,6 @@ const originConfig = require('./fixtures/config.json')
 const marked = new Marked(originConfig)
 const markeder = (...args) => marked.parse(...args)
 
-function rejects(promise) {
-  return promise
-    .then(() => Promise.reject(new Error('Missing expected rejection')))
-    .catch(reason => Promise.resolve(reason))
-}
-
 function getConfig() {
   return JSON.parse(JSON.stringify(originConfig))
 }
@@ -28,13 +22,11 @@ String.prototype.trim = function() {
 
 describe('processor', () => {
   it('no content', async () => {
-    const msg = 'No content. Check user, repository or authors fields'
-
     const config = getConfig()
     config.authors = ['author']
 
-    assert((await rejects(processor.call(config, issues))).message === msg)
-    assert((await rejects(processor.call(config, []))).message === msg)
+    assert((await processor.call(config, [])).posts.length === 0)
+    assert((await processor.call(config, issues)).posts.length === 0)
   })
 
   it('pagination', async () => {
