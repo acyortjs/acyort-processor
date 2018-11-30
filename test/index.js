@@ -12,7 +12,7 @@ function getConfig() {
   return JSON.parse(JSON.stringify(originConfig))
 }
 
-String.prototype.trim = function() {
+String.prototype.trim = function () {
   return this
     .replace(/\n/g, '')
     .replace(/[\t ]+\</g, '<')
@@ -134,7 +134,7 @@ describe('processor', () => {
 
   it('posts', async () => {
     const _config = getConfig()
-    let { posts } = await processor.call(_config, issues)
+    const { posts } = await processor.call(_config, issues)
     const post = posts[0]
     const issue = issues[1]
 
@@ -142,6 +142,7 @@ describe('processor', () => {
     assert(post.id === issue.id)
     assert(post.created === issue.created_at)
     assert(post.updated === issue.updated_at)
+    assert(post.number === issue.number)
     assert(post.title === issue.title)
     assert(`/${_config.post_dir}/${post.id}.html` === post.path)
     assert(`/${_config.post_dir}/${post.id}.html` === post.url)
